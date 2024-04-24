@@ -3,7 +3,7 @@ use anchor_lang::prelude::*;
 declare_id!("72hPR1CB4gmUjUyBFBBdsvCcETAEn965kmZUm9sakrxN");
 
 const PDA_SEED: &[u8] = b"otter_verify";
-const COMMAND_SIZE: usize = 500;
+
 
 #[program]
 pub mod otter_verify {
@@ -26,7 +26,7 @@ pub struct Initialize<'info> {
         seeds = [PDA_SEED, authority.key().as_ref(), program_address.key().as_ref()],
         bump,
         payer = authority, 
-        space = 8 + 2 * COMMAND_SIZE + 1, 
+        space = 8 + 2 * BuildParams::INIT_SPACE, 
     )]
     pub build_params: Account<'info, BuildParams>,
     #[account(mut)]
@@ -37,7 +37,9 @@ pub struct Initialize<'info> {
 }
 
 #[account]
+#[derive(InitSpace)]
 pub struct BuildParams {
+    #[max_len(10, 25)]
     pub command: Vec<String>,
     bump: u8,
 }
