@@ -12,7 +12,6 @@ pub mod otter_verify {
     use super::*;
 
     pub fn initialize(ctx: Context<Initialize>, params: InputParams) -> Result<()> {
-        msg!("Initialize otter-verify program");
         let otter_verify = &mut ctx.accounts.build_params;
         otter_verify.command = params.command;
         otter_verify.bump = ctx.bumps.build_params;
@@ -20,14 +19,12 @@ pub mod otter_verify {
     }
 
     pub fn update(ctx: Context<Update>, params: InputParams) -> Result<()> {
-        msg!("Update otter-verify program");
         let otter_verify = &mut ctx.accounts.build_params;
         otter_verify.command = params.command;
         Ok(())
     }
 
     pub fn close(_ctx: Context<Close>) -> Result<()> {
-        msg!("Close otter-verify program");
         Ok(())
     }
 }
