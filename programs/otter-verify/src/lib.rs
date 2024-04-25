@@ -5,7 +5,6 @@ declare_id!("72hPR1CB4gmUjUyBFBBdsvCcETAEn965kmZUm9sakrxN");
 
 const PDA_SEED: &[u8] = b"otter_verify";
 
-
 #[program]
 pub mod otter_verify {
 
@@ -29,36 +28,33 @@ pub mod otter_verify {
     }
 }
 
-
 fn calculate_space(input: &[String]) -> usize {
-    // 8 bytes for discriminator 
+    // 8 bytes for discriminator
     // 4 bytes for length of the vector
     // 4 + len bytes for each string in the vector
     // 1 byte for bump
-    8 + 4 + input.iter().map(|x| 4+x.len()).sum::<usize>() + 1
+    8 + 4 + input.iter().map(|x| 4 + x.len()).sum::<usize>() + 1
 }
 
 #[derive(Accounts)]
 #[instruction(instruction_data: InputParams)]
 pub struct Initialize<'info> {
     #[account(
-        init, 
+        init,
         seeds = [PDA_SEED, authority.key().as_ref(), program_address.key().as_ref()],
         bump,
-        payer = authority, 
-        space =  calculate_space(&instruction_data.command) 
+        payer = authority,
+        space =  calculate_space(&instruction_data.command)
     )]
     pub build_params: Account<'info, BuildParams>,
     #[account(mut)]
     pub authority: Signer<'info>,
-    /// CHECK: if this was actually program_address or not
+    #[account(executable)]
+    /// CHECK:
     pub program_address: AccountInfo<'info>,
     #[account(address = system_program::ID)]
     pub system_program: Program<'info, System>,
 }
-
-
-
 
 #[derive(Accounts)]
 #[instruction(instruction_data: InputParams)]
@@ -68,12 +64,13 @@ pub struct Update<'info> {
         seeds = [PDA_SEED, authority.key().as_ref(), program_address.key().as_ref()],
         bump = build_params.bump,
         realloc = calculate_space(&instruction_data.command),
-        realloc::zero = false, 
+        realloc::zero = false,
         realloc::payer=authority
     )]
     pub build_params: Account<'info, BuildParams>,
     #[account(mut)]
     pub authority: Signer<'info>,
+    #[account(executable)]
     /// CHECK:
     pub program_address: AccountInfo<'info>,
     #[account(address = system_program::ID)]
@@ -95,6 +92,7 @@ pub struct Close<'info> {
         close = authority
     )]
     pub data_account: Account<'info, BuildParams>,
+    #[account(executable)]
     /// CHECK:
     pub program_address: AccountInfo<'info>,
     #[account(mut)]
@@ -102,7 +100,6 @@ pub struct Close<'info> {
     #[account(address = system_program::ID)]
     pub system_program: Program<'info, System>,
 }
-
 
 #[derive(AnchorSerialize, AnchorDeserialize, Eq, PartialEq, Clone, Debug)]
 pub struct InputParams {
