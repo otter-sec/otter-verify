@@ -35,10 +35,7 @@ describe("otter-verify", async () => {
 
     await program.methods
       .initialize({
-        command: [
-          "--commit",
-          "098551f",
-        ],
+        command: ["--commit", "098551f"],
       })
       .accounts({
         buildParams: otter_verify_pda,
@@ -73,18 +70,22 @@ describe("otter-verify", async () => {
       .rpc();
     let buildParams = await program.account.buildParams.fetch(otter_verify_pda);
     assert(
-      buildParams.command[0]=="https://github.com/Ellipsis-Labs/phoenix-v1"
+      buildParams.command[0] == "https://github.com/Ellipsis-Labs/phoenix-v1"
     );
   });
 
   it("Is Closed!", async () => {
-    await program.methods.close().accounts({
-      buildParams: otter_verify_pda,
-      programAddress: other_program_id,
-      authority: user.publicKey,
-      systemProgram: anchor.web3.SystemProgram.programId,
-    }).signers([user]).rpc();
-    
+    await program.methods
+      .close()
+      .accounts({
+        buildParams: otter_verify_pda,
+        programAddress: other_program_id,
+        authority: user.publicKey,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      })
+      .signers([user])
+      .rpc();
+
     try {
       await program.account.buildParams.fetch(otter_verify_pda);
       // Should not reach here. If it does, the test should fail.
