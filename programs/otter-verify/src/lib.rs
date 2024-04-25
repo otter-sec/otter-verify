@@ -12,9 +12,7 @@ pub mod otter_verify {
     use super::*;
 
     pub fn initialize(ctx: Context<Initialize>, params: InputParams) -> Result<()> {
-        // Print space of the account
         msg!("Initialize otter-verify program");
-        msg!("Space: {}", ctx.accounts.build_params.to_account_info().data_len());
         let otter_verify = &mut ctx.accounts.build_params;
         otter_verify.command = params.command;
         otter_verify.bump = ctx.bumps.build_params;
@@ -23,9 +21,13 @@ pub mod otter_verify {
 
     pub fn update(ctx: Context<Update>, params: InputParams) -> Result<()> {
         msg!("Update otter-verify program");
-        msg!("Space: {}", ctx.accounts.build_params.to_account_info().data_len());
         let otter_verify = &mut ctx.accounts.build_params;
         otter_verify.command = params.command;
+        Ok(())
+    }
+
+    pub fn close(_ctx: Context<Close>) -> Result<()> {
+        msg!("Close otter-verify program");
         Ok(())
     }
 }
@@ -66,6 +68,8 @@ pub struct Initialize<'info> {
 pub struct Update<'info> {
     #[account(
         mut,
+        seeds = [PDA_SEED, authority.key().as_ref(), program_address.key().as_ref()],
+        bump,
         realloc = calculate_space(&instruction_data.command),
         realloc::zero = false, 
         realloc::payer=authority
@@ -83,6 +87,23 @@ pub struct Update<'info> {
 pub struct BuildParams {
     pub command: Vec<String>,
     bump: u8,
+}
+
+#[derive(Accounts)]
+pub struct Close<'info> {
+    #[account(
+        mut,
+        seeds = [PDA_SEED, authority.key().as_ref(), program_address.key().as_ref()],
+        bump,
+        close = authority
+    )]
+    pub data_account: Account<'info, BuildParams>,
+    /// CHECK:
+    pub program_address: AccountInfo<'info>,
+    #[account(mut)]
+    pub authority: Signer<'info>,
+    #[account(address = system_program::ID)]
+    pub system_program: Program<'info, System>,
 }
 
 

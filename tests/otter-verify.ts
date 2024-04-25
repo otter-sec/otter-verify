@@ -1,7 +1,7 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
 import { OtterVerify } from "../target/types/otter_verify";
-import { assert } from "console";
+import { assert } from "chai";
 
 describe("otter-verify", async () => {
   // Configure the client to use the local cluster.
@@ -73,7 +73,24 @@ describe("otter-verify", async () => {
       .rpc();
     let buildParams = await program.account.buildParams.fetch(otter_verify_pda);
     assert(
-      buildParams.command[0] == "https://github.com/Ellipsis-Labs/phoenix-v1"
+      buildParams.command[0]=="https://github.com/Ellipsis-Labs/phoenix-v1"
     );
+  });
+
+  it("Is Closed!", async () => {
+    await program.methods.close().accounts({
+      buildParams: otter_verify_pda,
+      programAddress: other_program_id,
+      authority: user.publicKey,
+      systemProgram: anchor.web3.SystemProgram.programId,
+    }).signers([user]).rpc();
+    
+    try {
+      await program.account.buildParams.fetch(otter_verify_pda);
+      // Should not reach here. If it does, the test should fail.
+      assert(false);
+    } catch (err) {
+      assert(err.toString().includes("Account does not exist or has no data"));
+    }
   });
 });
