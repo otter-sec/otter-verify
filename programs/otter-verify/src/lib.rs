@@ -51,7 +51,7 @@ pub struct Initialize<'info> {
     pub build_params: Account<'info, BuildParams>,
     #[account(mut)]
     pub authority: Signer<'info>,
-    /// CHECK:
+    /// CHECK: if this was actually program_address or not
     pub program_address: AccountInfo<'info>,
     #[account(address = system_program::ID)]
     pub system_program: Program<'info, System>,
@@ -66,7 +66,7 @@ pub struct Update<'info> {
     #[account(
         mut,
         seeds = [PDA_SEED, authority.key().as_ref(), program_address.key().as_ref()],
-        bump,
+        bump = build_params.bump,
         realloc = calculate_space(&instruction_data.command),
         realloc::zero = false, 
         realloc::payer=authority
