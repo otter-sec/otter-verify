@@ -1,9 +1,19 @@
 use anchor_lang::prelude::*;
 use anchor_lang::solana_program::system_program;
+use solana_security_txt::security_txt;
 
 declare_id!("72hPR1CB4gmUjUyBFBBdsvCcETAEn965kmZUm9sakrxN");
 
 const PDA_SEED: &[u8] = b"otter_verify";
+
+security_txt! {
+  name: "Otter Verify",
+  project_url: "https://osec.io/",
+  contacts: "email:contact@osec.io",
+  preferred_languages: "en",
+  source_code: "https://github.com/otter-sec/otter-verify",
+  policy: "https://github.com/otter-sec/otter-verify/SECURITY.md"
+}
 
 #[program]
 pub mod otter_verify {
