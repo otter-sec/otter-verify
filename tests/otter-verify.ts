@@ -35,7 +35,9 @@ describe("otter-verify", async () => {
 
     await program.methods
       .initialize({
-        command: ["--commit", "098551f"],
+        gitUrl: "https://github.com/Ellipsis-Labs/phoenix-v1",
+        commit: "",
+        command: [],
       })
       .accounts({
         buildParams: otter_verify_pda,
@@ -47,18 +49,15 @@ describe("otter-verify", async () => {
       .rpc();
 
     let params = await program.account.buildParams.fetch(otter_verify_pda);
-    assert(params.command[0] == "--commit");
-    assert(params.command.length == 2);
+    assert(params.gitUrl == "https://github.com/Ellipsis-Labs/phoenix-v1");
   });
 
   it("Is Updated!", async () => {
     await program.methods
       .update({
-        command: [
-          "https://github.com/Ellipsis-Labs/phoenix-v1",
-          "--commit",
-          "098551f",
-        ],
+        gitUrl: "https://github.com/Ellipsis-Labs/phoenix-v1",
+        commit: "098551f",
+        command: ["--libname", "phoenix-v1"],
       })
       .accounts({
         buildParams: otter_verify_pda,
@@ -68,10 +67,10 @@ describe("otter-verify", async () => {
       })
       .signers([user])
       .rpc();
-    let buildParams = await program.account.buildParams.fetch(otter_verify_pda);
-    assert(
-      buildParams.command[0] == "https://github.com/Ellipsis-Labs/phoenix-v1"
-    );
+    let params = await program.account.buildParams.fetch(otter_verify_pda);
+    assert(params.commit == "098551f");
+    assert(params.command[0] == "--libname");
+    assert(params.command[1] == "phoenix-v1");
   });
 
   it("Is Closed!", async () => {

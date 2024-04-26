@@ -22,6 +22,8 @@ pub mod otter_verify {
 
     pub fn initialize(ctx: Context<Initialize>, params: InputParams) -> Result<()> {
         let otter_verify = &mut ctx.accounts.build_params;
+        otter_verify.git_url = params.git_url;
+        otter_verify.commit = params.commit;
         otter_verify.command = params.command;
         otter_verify.bump = ctx.bumps.build_params;
         Ok(())
@@ -29,6 +31,8 @@ pub mod otter_verify {
 
     pub fn update(ctx: Context<Update>, params: InputParams) -> Result<()> {
         let otter_verify = &mut ctx.accounts.build_params;
+        otter_verify.git_url = params.git_url;
+        otter_verify.commit = params.commit;
         otter_verify.command = params.command;
         Ok(())
     }
@@ -38,12 +42,20 @@ pub mod otter_verify {
     }
 }
 
-fn calculate_space(input: &[String]) -> usize {
+fn calculate_space(input: &InputParams) -> usize {
     // 8 bytes for discriminator
+    // 4 + len(git_url) for git_url
+    // 4 + len(commit) for commit
     // 4 bytes for length of the vector
     // 4 + len bytes for each string in the vector
     // 1 byte for bump
-    8 + 4 + input.iter().map(|x| 4 + x.len()).sum::<usize>() + 1
+    8 + 4
+        + input.git_url.len()
+        + 4
+        + input.commit.len()
+        + 4
+        + input.command.iter().map(|x| 4 + x.len()).sum::<usize>()
+        + 1
 }
 
 #[derive(Accounts)]
@@ -54,7 +66,7 @@ pub struct Initialize<'info> {
         seeds = [PDA_SEED, authority.key().as_ref(), program_address.key().as_ref()],
         bump,
         payer = authority,
-        space =  calculate_space(&instruction_data.command)
+        space =  calculate_space(&instruction_data)
     )]
     pub build_params: Account<'info, BuildParams>,
     #[account(mut)]
@@ -73,7 +85,7 @@ pub struct Update<'info> {
         mut,
         seeds = [PDA_SEED, authority.key().as_ref(), program_address.key().as_ref()],
         bump = build_params.bump,
-        realloc = calculate_space(&instruction_data.command),
+        realloc = calculate_space(&instruction_data),
         realloc::zero = false,
         realloc::payer=authority
     )]
@@ -89,6 +101,8 @@ pub struct Update<'info> {
 
 #[account]
 pub struct BuildParams {
+    pub git_url: String,
+    pub commit: String,
     pub command: Vec<String>,
     bump: u8,
 }
@@ -113,5 +127,7 @@ pub struct Close<'info> {
 
 #[derive(AnchorSerialize, AnchorDeserialize, Eq, PartialEq, Clone, Debug)]
 pub struct InputParams {
+    pub git_url: String,
+    pub commit: String,
     pub command: Vec<String>,
 }
