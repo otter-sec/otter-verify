@@ -1,5 +1,4 @@
 use anchor_lang::prelude::*;
-use anchor_lang::solana_program::system_program;
 use solana_security_txt::security_txt;
 
 declare_id!("72hPR1CB4gmUjUyBFBBdsvCcETAEn965kmZUm9sakrxN");
@@ -24,7 +23,7 @@ pub mod otter_verify {
         let otter_verify = &mut ctx.accounts.build_params;
         otter_verify.git_url = params.git_url;
         otter_verify.commit = params.commit;
-        otter_verify.command = params.command;
+        otter_verify.args = params.args;
         otter_verify.bump = ctx.bumps.build_params;
         Ok(())
     }
@@ -33,7 +32,7 @@ pub mod otter_verify {
         let otter_verify = &mut ctx.accounts.build_params;
         otter_verify.git_url = params.git_url;
         otter_verify.commit = params.commit;
-        otter_verify.command = params.command;
+        otter_verify.args = params.args;
         Ok(())
     }
 
@@ -54,7 +53,7 @@ fn calculate_space(input: &InputParams) -> usize {
         + 4
         + input.commit.len()
         + 4
-        + input.command.iter().map(|x| 4 + x.len()).sum::<usize>()
+        + input.args.iter().map(|x| 4 + x.len()).sum::<usize>()
         + 1
 }
 
@@ -74,7 +73,6 @@ pub struct Initialize<'info> {
     #[account(executable)]
     /// CHECK:
     pub program_address: AccountInfo<'info>,
-    #[account(address = system_program::ID)]
     pub system_program: Program<'info, System>,
 }
 
@@ -95,7 +93,6 @@ pub struct Update<'info> {
     #[account(executable)]
     /// CHECK:
     pub program_address: AccountInfo<'info>,
-    #[account(address = system_program::ID)]
     pub system_program: Program<'info, System>,
 }
 
@@ -103,7 +100,7 @@ pub struct Update<'info> {
 pub struct BuildParams {
     pub git_url: String,
     pub commit: String,
-    pub command: Vec<String>,
+    pub args: Vec<String>,
     bump: u8,
 }
 
@@ -121,13 +118,11 @@ pub struct Close<'info> {
     pub program_address: AccountInfo<'info>,
     #[account(mut)]
     pub authority: Signer<'info>,
-    #[account(address = system_program::ID)]
-    pub system_program: Program<'info, System>,
 }
 
-#[derive(AnchorSerialize, AnchorDeserialize, Eq, PartialEq, Clone, Debug)]
+#[derive(AnchorSerialize, AnchorDeserialize)]
 pub struct InputParams {
     pub git_url: String,
     pub commit: String,
-    pub command: Vec<String>,
+    pub args: Vec<String>,
 }
