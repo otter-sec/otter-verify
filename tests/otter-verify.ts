@@ -35,6 +35,7 @@ describe("otter-verify", async () => {
 
     await program.methods
       .initialize({
+        version: "1.0.0",
         gitUrl: "https://github.com/Ellipsis-Labs/phoenix-v1",
         commit: "",
         args: [],
@@ -55,6 +56,7 @@ describe("otter-verify", async () => {
   it("Is Updated!", async () => {
     await program.methods
       .update({
+        version: "1.0.0",
         gitUrl: "https://github.com/Ellipsis-Labs/phoenix-v1",
         commit: "098551f",
         args: ["--libname", "phoenix-v1"],

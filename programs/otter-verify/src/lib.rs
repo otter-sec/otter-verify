@@ -21,6 +21,7 @@ pub mod otter_verify {
 
     pub fn initialize(ctx: Context<Initialize>, params: InputParams) -> Result<()> {
         let otter_verify = &mut ctx.accounts.build_params;
+        otter_verify.version = params.version;
         otter_verify.git_url = params.git_url;
         otter_verify.commit = params.commit;
         otter_verify.args = params.args;
@@ -30,6 +31,7 @@ pub mod otter_verify {
 
     pub fn update(ctx: Context<Update>, params: InputParams) -> Result<()> {
         let otter_verify = &mut ctx.accounts.build_params;
+        otter_verify.version = params.version;
         otter_verify.git_url = params.git_url;
         otter_verify.commit = params.commit;
         otter_verify.args = params.args;
@@ -43,12 +45,15 @@ pub mod otter_verify {
 
 fn calculate_space(input: &InputParams) -> usize {
     // 8 bytes for discriminator
+    // 4 + len(version) for version
     // 4 + len(git_url) for git_url
     // 4 + len(commit) for commit
     // 4 bytes for length of the vector
     // 4 + len bytes for each string in the vector
     // 1 byte for bump
     8 + 4
+        + input.version.len()
+        + 4
         + input.git_url.len()
         + 4
         + input.commit.len()
@@ -98,6 +103,7 @@ pub struct Update<'info> {
 
 #[account]
 pub struct BuildParams {
+    pub version: String,
     pub git_url: String,
     pub commit: String,
     pub args: Vec<String>,
@@ -122,6 +128,7 @@ pub struct Close<'info> {
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
 pub struct InputParams {
+    pub version: String,
     pub git_url: String,
     pub commit: String,
     pub args: Vec<String>,
