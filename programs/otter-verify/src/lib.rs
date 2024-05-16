@@ -127,11 +127,11 @@ pub struct Close<'info> {
         close = authority
     )]
     pub data_account: Account<'info, BuildParams>,
+    #[account(mut)]
+    pub authority: Signer<'info>,
     #[account(executable)]
     /// CHECK:
     pub program_address: AccountInfo<'info>,
-    #[account(mut)]
-    pub authority: Signer<'info>,
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize)]

@@ -80,8 +80,8 @@ describe("otter-verify", async () => {
       .close()
       .accounts({
         buildParams: otter_verify_pda,
-        programAddress: other_program_id,
         authority: user.publicKey,
+        programAddress: other_program_id,
       })
       .signers([user])
       .rpc();
