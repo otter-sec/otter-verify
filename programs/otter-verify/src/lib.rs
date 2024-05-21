@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 use solana_security_txt::security_txt;
 
-declare_id!("72hPR1CB4gmUjUyBFBBdsvCcETAEn965kmZUm9sakrxN");
+declare_id!("verifycLy8mB96wd9wqq3WDXQwM4oU6r42Th37Db9fC");
 
 const PDA_SEED: &[u8] = b"otter_verify";
 
