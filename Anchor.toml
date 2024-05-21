@@ -5,7 +5,7 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-otter_verify = "72hPR1CB4gmUjUyBFBBdsvCcETAEn965kmZUm9sakrxN"
+otter_verify = "verifycLy8mB96wd9wqq3WDXQwM4oU6r42Th37Db9fC"
 
 [registry]
 url = "https://api.apr.dev"
