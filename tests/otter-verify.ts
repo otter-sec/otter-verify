@@ -33,12 +33,21 @@ describe("otter-verify", async () => {
     );
     await provider.connection.confirmTransaction(airdrop_tx, "confirmed");
 
+    const listenerMyEvent = program.addEventListener(
+      "otterVerifyEvent",
+      (event, slot) => {
+        console.log("Event received! slot ${slot} Value", event);
+        assert(event.program == "PhoeNiXZ8ByJGLkxNfZRnkUfjvmuYqLR89jjFHGqdXY");
+      }
+    );
+
     await program.methods
       .initialize({
         version: "1.0.0",
         gitUrl: "https://github.com/Ellipsis-Labs/phoenix-v1",
         commit: "",
         args: [],
+        deploy_slot: 0,
       })
       .accounts({
         buildParams: otter_verify_pda,
@@ -48,6 +57,9 @@ describe("otter-verify", async () => {
       })
       .signers([user])
       .rpc();
+
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+    program.removeEventListener(listenerMyEvent);
 
     let params = await program.account.buildParams.fetch(otter_verify_pda);
     assert(params.gitUrl == "https://github.com/Ellipsis-Labs/phoenix-v1");
@@ -60,6 +72,7 @@ describe("otter-verify", async () => {
         gitUrl: "https://github.com/Ellipsis-Labs/phoenix-v1",
         commit: "098551f",
         args: ["--libname", "phoenix-v1"],
+        deploy_slot: 0,
       })
       .accounts({
         buildParams: otter_verify_pda,

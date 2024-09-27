@@ -20,6 +20,13 @@ pub mod otter_verify {
     use super::*;
 
     pub fn initialize(ctx: Context<Initialize>, params: InputParams) -> Result<()> {
+        emit!(
+            OtterVerifyEvent {
+                signer: *ctx.accounts.authority.key,
+                program: *ctx.accounts.program_address.key,
+                params: params.clone()
+            }
+        );
         let otter_verify = &mut ctx.accounts.build_params;
         otter_verify.address = *ctx.accounts.program_address.key;
         otter_verify.signer = *ctx.accounts.authority.key;
@@ -28,15 +35,24 @@ pub mod otter_verify {
         otter_verify.commit = params.commit;
         otter_verify.args = params.args;
         otter_verify.bump = ctx.bumps.build_params;
+        otter_verify.deploy_slot = params.deploy_slot;
         Ok(())
     }
 
     pub fn update(ctx: Context<Update>, params: InputParams) -> Result<()> {
+        emit!(
+            OtterVerifyEvent {
+                signer: *ctx.accounts.authority.key,
+                program: *ctx.accounts.program_address.key,
+                params: params.clone()
+            }
+        );
         let otter_verify = &mut ctx.accounts.build_params;
         otter_verify.version = params.version;
         otter_verify.git_url = params.git_url;
         otter_verify.commit = params.commit;
         otter_verify.args = params.args;
+        otter_verify.deploy_slot = params.deploy_slot;
         Ok(())
     }
 
@@ -54,6 +70,7 @@ fn calculate_space(input: &InputParams) -> usize {
     // 4 + len(commit) for commit
     // 4 bytes for length of the vector
     // 4 + len bytes for each string in the vector
+    // 8 bytes for deploy_slot 
     // 1 byte for bump
     8 + 32
         + 32
@@ -65,6 +82,7 @@ fn calculate_space(input: &InputParams) -> usize {
         + input.commit.len()
         + 4
         + input.args.iter().map(|x| 4 + x.len()).sum::<usize>()
+        + 8
         + 1
 }
 
@@ -115,6 +133,7 @@ pub struct BuildParams {
     pub git_url: String,
     pub commit: String,
     pub args: Vec<String>,
+    pub deploy_slot: u64,
     bump: u8,
 }
 
@@ -134,10 +153,18 @@ pub struct Close<'info> {
     pub program_address: AccountInfo<'info>,
 }
 
-#[derive(AnchorSerialize, AnchorDeserialize)]
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub struct InputParams {
     pub version: String,
     pub git_url: String,
     pub commit: String,
     pub args: Vec<String>,
+    pub deploy_slot: u64,
+}
+
+#[event]
+pub struct OtterVerifyEvent {
+    pub signer: Pubkey,
+    pub program: Pubkey,
+    pub params: InputParams,
 }
