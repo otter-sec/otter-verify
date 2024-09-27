@@ -47,7 +47,7 @@ describe("otter-verify", async () => {
         gitUrl: "https://github.com/Ellipsis-Labs/phoenix-v1",
         commit: "",
         args: [],
-        deploy_slot: 0,
+        deploySlot: new anchor.BN(1234567890),
       })
       .accounts({
         buildParams: otter_verify_pda,
@@ -63,6 +63,8 @@ describe("otter-verify", async () => {
 
     let params = await program.account.buildParams.fetch(otter_verify_pda);
     assert(params.gitUrl == "https://github.com/Ellipsis-Labs/phoenix-v1");
+    let slot = Number(params.deploySlot);
+    assert(slot == 1234567890);
   });
 
   it("Is Updated!", async () => {
