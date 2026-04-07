@@ -6,7 +6,9 @@
 
 ## Build Verification
 
- Use the [Solana Verify CLI](https://github.com/solana-foundation/solana-verifiable-build) to confirm that the deployed program at `verifycLy8mB96wd9wqq3WDXQwM4oU6r42Th37Db9fC` matches this repository. After installing the CLI, run:
+ Use the [Solana Verify CLI](https://github.com/solana-foundation/solana-verifiable-build) to confirm that the deployed program at `verifycLy8mB96wd9wqq3WDXQwM4oU6r42Th37Db9fC` matches this repository. 
+ 
+ After installing the CLI, run:
 
 ```bash
 solana-verify -um verify-from-repo \
